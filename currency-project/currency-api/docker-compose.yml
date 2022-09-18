@@ -1,0 +1,44 @@
+version: '3.3'
+services:
+  dev:
+    image: currency-api:latest
+    ports:
+      - '3000:3000'
+    expose:
+      - '3000'
+    environment:
+      DB_HOST: "db"
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+  db:
+    image: mysql:5.7.8
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'test'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'user'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - my-db-mme:/var/lib/mysql
+  test_db:
+    image: mysql:5.7.8
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'test_db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'user'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - '3307:3306'
+    expose:
+      - '3307'
+    volumes:
+      - my-test-db-mme:/var/lib/mysql
+volumes:
+  my-db-mme:
+  my-test-db-mme:
