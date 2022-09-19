@@ -1,0 +1,11 @@
+FROM node:16-alpine
+
+RUN mkdir -p /service
+
+COPY . /service
+
+RUN cd /service && npm ci
+
+WORKDIR /service
+
+CMD ["npm","start"]
