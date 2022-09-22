@@ -66,8 +66,8 @@ export class ExchangerateCurrencyService implements CurrencyService {
         >
       >(
         `SELECT base, date, ${selectStatement}
-                                                          FROM currency
-                                                          WHERE date = '${requestDate}'`,
+                 FROM currency
+                 WHERE date = '${requestDate}'`,
         { type: QueryTypes.SELECT },
       );
     } catch (e) {
@@ -107,18 +107,6 @@ export class ExchangerateCurrencyService implements CurrencyService {
         this.httpService
           .get<ExchangerateTimeseriesResponse>(url)
           .pipe(map((res) => res.data)),
-      );
-      console.log(
-        Object.entries(data.rates).map(([date, rate]) => ({
-          date,
-          base: data.base,
-          EUR: rate.EUR,
-          USD: rate.USD,
-          PLN: rate.PLN,
-        })),
-        {
-          updateOnDuplicate: [...CurrencyTypes],
-        },
       );
       await this.currencyModel.bulkCreate(
         Object.entries(data.rates).map(([date, rate]) => ({

@@ -13,7 +13,6 @@ import {
 } from './currency-service.interface';
 import { ConvertRequest, ConvertResponse } from './contract/convert';
 import { CurrencyTypes } from './contract/exchangerate';
-import { DateTime } from 'luxon';
 
 @Controller('currency')
 export class CurrencyController {
