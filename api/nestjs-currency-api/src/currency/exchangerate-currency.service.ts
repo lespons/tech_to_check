@@ -1,15 +1,8 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { DateTime } from 'luxon';
-import {
-  ConvertedCurrencyResult,
-  CurrencyService,
-} from './currency-service.interface';
-import {
-  CurrencyTypes,
-  ExchangerateLatestResponse,
-  ExchangerateTimeseriesResponse,
-} from './contract/exchangerate';
+import { ConvertedCurrencyResult, CurrencyService, } from './currency-service.interface';
+import { CurrencyTypes, ExchangerateLatestResponse, ExchangerateTimeseriesResponse, } from './contract/exchangerate';
 import { lastValueFrom, map } from 'rxjs';
 import { CurrencyModel } from './model/currency';
 import { InjectModel } from '@nestjs/sequelize';
@@ -44,7 +37,7 @@ export class ExchangerateCurrencyService implements CurrencyService {
         : DateTime.utc().minus({ day: 1 }).toSQLDate();
 
       this.logger.verbose(`get convert for ${requestDate}`);
-      // I would use model selection and calc that out
+      // todo use model selection and calc that out
       // this.currencyModel.findOne({
       //     where: {
       //

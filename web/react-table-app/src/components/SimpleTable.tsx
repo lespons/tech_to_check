@@ -19,23 +19,34 @@ export const SimpleTable = ({ head, data, mobileView }: TableProps) => {
 
     const [filterData, setFilterData] = useState(data);
     const [, startTransition] = useTransition();
-    const selectedColumn = useRef<string[] | undefined>(undefined);
+    const selectedColumn = useRef<{
+        column: string,
+        value: string
+    } | undefined>(undefined);
     const searchValue = useRef<string | undefined>(undefined);
 
     const cellClick = useCallback((headCell: HeadCellType, cell: CellType) => {
         const fValue = String(cell[headCell.key]);
-        selectedColumn.current = [headCell.key, fValue];
+        selectedColumn.current = { column: headCell.key, value: fValue };
         onInput(searchValue.current || "");
         //TODO: change url to keep filter
     }, [data]);
 
-    const onInput = (val: string) => {
+    // TODO useFilter
+    const filterValues = (val: string) => {
         const searchVal = val?.toString().toLowerCase();
         startTransition(() => {
             setFilterData(() => {
                 return data.filter(d => {
-                    return (selectedColumn.current ? String(d[selectedColumn.current[0]]) === selectedColumn.current[1] : true)
-                        && Object.values(d).some(v => String(v).toLowerCase().indexOf(searchVal) >= 0)
+
+                    const fromColumnGroup = selectedColumn.current ? String(d[selectedColumn.current.column]) === selectedColumn.current.value : true;
+
+                    if (!fromColumnGroup) {
+                        return false;
+                    }
+
+                    const textValueInColumns = Object.values(d).some(v => String(v).toLowerCase().indexOf(searchVal) >= 0);
+                    return textValueInColumns;
                 });
             });
 
@@ -44,13 +55,17 @@ export const SimpleTable = ({ head, data, mobileView }: TableProps) => {
         });
     }
 
+    const onInput = (val: string) => {
+        filterValues(val);
+    }
+
     const onResetGroup = () => {
         selectedColumn.current = undefined;
-        onInput(searchValue.current || "");
+        filterValues(searchValue.current || "");
     }
+
     return <Container>
         <ControlContainer>
-
             <FilterContainer>
                 {/*TODO: add pagination*/}
                 <SearchContainer>
@@ -62,8 +77,8 @@ export const SimpleTable = ({ head, data, mobileView }: TableProps) => {
                 </SearchContainer>
                 <GroupContainer>
                     {selectedColumn.current ?
-                        <button role="button" name="reset" onClick={() => onResetGroup()}>
-                            {selectedColumn.current[0]}[{selectedColumn.current[1]}] x
+                        <button role="button" name="reset" onClick={onResetGroup}>
+                            {selectedColumn.current.column}[{selectedColumn.current.value}] x
                         </button> : null}
                 </GroupContainer>
             </FilterContainer>
@@ -74,12 +89,11 @@ export const SimpleTable = ({ head, data, mobileView }: TableProps) => {
                         {
                             head.map((headCell) => (
                                 <TableRow key={(cell.guid + headCell.key) || index}>
-                                    {/*TODO: add head cells per row, not for each cell?*/}
                                     <TableHeadCell key={"headcell_" + headCell.key}>{headCell.title}</TableHeadCell>
                                     <TableCell
                                         onClick={() => cellClick(headCell, cell)}
                                         key={String(headCell.key)}
-                                        selected={selectedColumn.current?.[0] === headCell.key}
+                                        selected={selectedColumn.current?.column === headCell.key}
                                     >
                                         {String(cell[headCell.key])}
                                     </TableCell>
@@ -104,7 +118,7 @@ export const SimpleTable = ({ head, data, mobileView }: TableProps) => {
                                     <TableCell
                                         onClick={() => cellClick(headCell, cell)}
                                         key={String(headCell.key)}
-                                        selected={selectedColumn.current?.[0] === headCell.key}
+                                        selected={selectedColumn.current?.column === headCell.key}
                                     >
                                         {String(cell[headCell.key])}
                                     </TableCell>))

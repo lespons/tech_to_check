@@ -1,33 +1,36 @@
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useDebounce } from "./useDebounce";
 
 export const SIZE_BREAKPOINTS = { mob: 1000 };
 
 type useOnWindowResizeCallbackType = () => void;
 
-// FIXME: use debounce
 const useOnWindowResize = (callback: useOnWindowResizeCallbackType) => {
-    const listener = useRef<useOnWindowResizeCallbackType | null>(null);
+    const listener = useRef<ReturnType<typeof useDebounce<UIEvent>> | null>(null);
 
+    const inputHandler = useDebounce<UIEvent>(
+        () => callback(),
+        1000
+    );
     useEffect(() => {
         if (typeof window === "undefined") {
             return;
         }
 
         if (listener.current)
-            window.removeEventListener('resize', listener.current);
+            window.removeEventListener('resize', inputHandler);
 
-        listener.current = callback;
-        window.addEventListener('resize', callback);
+        listener.current = inputHandler;
+        window.addEventListener('resize', listener.current);
         return () => {
             if (listener.current) {
                 window.removeEventListener('resize', listener.current);
             }
         };
-    }, [callback]);
+    }, [inputHandler]);
 };
 
 export const useResponsiveValue = () => {
-    const [, startTransition] = useTransition();
     const [breakpoint, setBreakpoint] = useState<"mob" | "desktop" | undefined>();
 
     const updateBreakpoint = () => {
@@ -41,9 +44,7 @@ export const useResponsiveValue = () => {
         setBreakpoint("desktop");
     }
     useOnWindowResize(() => {
-            startTransition(() => {
-                updateBreakpoint();
-            });
+            updateBreakpoint();
         }
     );
 
