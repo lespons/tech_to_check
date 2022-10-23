@@ -1,0 +1,19 @@
+FROM node:16-alpine as build
+
+RUN mkdir -p /service
+
+COPY . /service
+
+RUN npm i -g create-nx-workspace
+
+RUN cd /service && npm ci && npx nx build-storybook form
+
+
+FROM node:16-alpine
+
+COPY --from=build /service/dist/storybook/form /service
+
+RUN npm install -g serve
+WORKDIR /service
+
+CMD ["npx", "serve"]
