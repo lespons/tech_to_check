@@ -94,7 +94,7 @@ export class FormProxy {
     }
 
     this.rules
-      ?.validate(this.values, { abortEarly: false, strict: true })
+      ?.validate(this.values, { abortEarly: false })
       .then(() => {
         onCompleted?.(this.values, null);
       })

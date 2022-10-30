@@ -3,6 +3,7 @@ import React, {
   forwardRef,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
 } from 'react';
 import { FieldsContext } from './context';
@@ -83,14 +84,17 @@ export const Form = forwardRef<FormElement, FormProps>(
       mounted.current = true;
     }, []);
 
+    const contextValue = useMemo(
+      () => ({
+        formName,
+        form: formInstance,
+      }),
+      [formName, formInstance]
+    );
+
     // TODO handle FormChildrenRender type
     return (
-      <FieldsContext.Provider
-        value={{
-          formName,
-          form: formInstance,
-        }}
-      >
+      <FieldsContext.Provider value={contextValue}>
         <Component
           {...restProps}
           role="form"
