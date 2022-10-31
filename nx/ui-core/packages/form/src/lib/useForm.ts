@@ -8,7 +8,7 @@ import {
 } from './models';
 import { useRef } from 'react';
 import type { AnySchema } from 'yup';
-import { ValidationError } from 'yup';
+import { NumberSchema, reach, ValidationError } from 'yup';
 
 export class FormProxy {
   private initialValues: FormValues = {};
@@ -93,14 +93,26 @@ export class FormProxy {
       return;
     }
 
+    const valuesToValidate = Object.keys(this.values)
+      .filter((k: string) => {
+        if (
+          reach(this.rules!, k) instanceof NumberSchema &&
+          this.values[k] === ''
+        ) {
+          return false;
+        }
+        return true;
+      })
+      .reduce((a, k) => ({ ...a, [k]: this.values[k] }), {});
+
     this.rules
-      ?.validate(this.values, { abortEarly: false })
+      ?.validate(valuesToValidate, { abortEarly: false })
       .then(() => {
         onCompleted?.(this.values, null);
       })
       .catch((error: ValidationError) => {
         error.inner.forEach(({ errors, path }) =>
-          path ? this.fields[path].setFieldError(errors) : null
+          path ? this.fields[path]?.setFieldError(errors) : null
         );
 
         onCompleted?.(

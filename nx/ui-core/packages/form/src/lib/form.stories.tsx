@@ -21,7 +21,6 @@ export default {
 export const BaseForm: ComponentStory<typeof Form> = () => (
   <Form
     name={'userForm'}
-    onChange={(...args) => console.log(...args)}
     rules={yup.object().shape({
       firstName: yup.string().required(),
       secondName: yup.string(),
@@ -39,7 +38,6 @@ export const BaseForm: ComponentStory<typeof Form> = () => (
         alert('Thanks for registration!');
       }
     }}
-    onValuesChanged={(...args) => console.log(...args)}
     initialValues={{
       phoneNumber: '+48',
     }}

@@ -30,8 +30,8 @@ export const InputField = React.forwardRef<FormFieldElement, FormFieldProps>(
   ) => {
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const formContext = useContext(FieldsContext);
-    const formFieldName = `${formContext.formName || ''}_${name}`;
+    const fieldsContext = useContext(FieldsContext);
+    const formFieldName = `${fieldsContext.formName || ''}_${name}`;
 
     const [value, setValue] = useState<any>(null);
     const [error, setError] = useState<string[] | null | undefined>(null);
@@ -49,12 +49,12 @@ export const InputField = React.forwardRef<FormFieldElement, FormFieldProps>(
     );
 
     useLayoutEffect(() => {
-      const form = formContext.form as MainFormInstance;
+      const form = fieldsContext.form as MainFormInstance;
 
       if (!form) {
         throw Error('InputField should be used with FormContext');
       }
-      const initialValue = (formContext.form as MainFormInstance)
+      const initialValue = (fieldsContext.form as MainFormInstance)
         .getInnerCalls()
         .getInitialValues()[name];
 
@@ -62,14 +62,14 @@ export const InputField = React.forwardRef<FormFieldElement, FormFieldProps>(
     }, []);
 
     useEffect(() => {
-      const calls = (formContext.form as MainFormInstance).getInnerCalls();
+      const calls = (fieldsContext.form as MainFormInstance).getInnerCalls();
 
       calls.registerFields(name, fieldsHandlers);
 
       return () => {
         calls.unregisterFields(name);
       };
-    }, [fieldsHandlers, name, formContext.form]);
+    }, [fieldsHandlers, name, fieldsContext.form]);
 
     useImperativeHandle(ref, () => fieldsHandlers);
 
@@ -85,7 +85,7 @@ export const InputField = React.forwardRef<FormFieldElement, FormFieldProps>(
           value={controlledValue(value)}
           onChange={(e) => {
             setValue(e.target.value);
-            (formContext.form as MainFormInstance)
+            (fieldsContext.form as MainFormInstance)
               .getInnerCalls()
               .triggerValuesChanged({
                 [name]: e.target.value,
