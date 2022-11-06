@@ -1,0 +1,10 @@
+version: '3.3'
+services:
+  build:
+    image: salary-app-webapp:latest
+    ports:
+      - '3000:3000'
+    expose:
+      - '3000'
+    build:
+      context: .

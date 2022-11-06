@@ -75,7 +75,7 @@ const SubmitButton = styled.button`
   font-size: 1rem;
 `;
 
-const StyledFormInput = styled.form`
+const StyledFormInput = styled.div`
   label {
     display: flex;
   }
